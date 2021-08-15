@@ -285,6 +285,93 @@ var findMedianSortedArrays = function(nums1, nums2) {
 #### 代码
 
 ```javascript
+ var checkStr = (s) => {
+  let len = s.length;
+  let left=0,right=len-1;
+  if(len==2&&s[0]!=s[1]) {
+    return false;
+  }
+  while(left!=right&&left-1!=right) {
+    if(s[left]==s[right]) {
+      left++;right--;
+    } else {
+      return false
+    }
+  }
+  return true
+}
+
+var longestPalindrome = (s) => {
+  let maxStr = '';
+  for(let i=0;i<s.length;i++) {
+    for(let j=i+1;j<s.length+1;j++) {
+      let str = s.slice(i,j);
+      if(checkStr(str)==true && str.length>=maxStr.length) {
+        maxStr = str;
+      }
+    }  
+  }
+  return maxStr
+}
+```
+
+#### 复杂度分析
+
++ 时间复杂度：$ O(N^2) $。
++ 空间复杂度：$ O(1) $。
+
+### 方法二：中心扩散
+
+#### 思路及算法
+如果是一个回文字符串，说明其有一个对称轴，从这个对称轴往两侧延伸，如果一直到边界都符合左右指针指向字符都相同的情况，则证明此字符串回文。
+这样只需要遍历一遍字符串，对每一个字符都进行中心扩散，就可以找到所有回文子串，记录下最大长度的回文子串即可。
+
+#### 代码
+
+```javascript
+var longestPalindrome = function(s) {
+  let len = s.length;
+  if(len<2) {
+    return s;
+  }
+  let left=0,right=0;
+  for(let i=0;i<len;i++) {
+    check(i,i+1);check(i,i);
+  }
+
+  function check(m,n) {
+    while(m>=0 && n<len && s[m]==s[n]) {
+      m--;n++;
+    }
+    if(n-m>right-left) {
+      left = m; right = n;
+    }
+  }
+
+  return s.slice(left+1,right)
+}
+```
+
+#### 复杂度分析
+
++ 时间复杂度：$ O(N^2) $。
++ 空间复杂度：$ O(1) $。
+
+---
+
+## [10. 正则表达式匹配](https://leetcode-cn.com/problems/regular-expression-matching/)
+
+![](images/6.png)
+
+### 方法一：暴力匹配
+首先判断两个字符串的长度，如果第二个字符串不含 * 且长度比第一个字符串小，则直接返回 false 即可。
+
+
+#### 思路及算法
+
+#### 代码
+
+```javascript
 ```
 
 #### 复杂度分析
@@ -305,3 +392,101 @@ var findMedianSortedArrays = function(nums1, nums2) {
 
 + 时间复杂度：$ O(N^2) $。
 + 空间复杂度：$ O(N^2) $。
+
+---
+
+## [11. 盛最多水的容器](https://leetcode-cn.com/problems/container-with-most-water/)
+
+![](images/7.png)
+
+### 方法一：暴力
+
+#### 思路及算法
+暴力解法也就是遍历所有可能的数字对，以二者中较小值作为高度，二者之间的序列值的差值作为宽度，相乘即可得到区域面积；通过记录最大面积作为返回值
+
+#### 代码
+
+```javascript
+var maxArea = function(height) {
+    let len = height.length;
+    let maxWater = 0;
+    for(let i=0; i<len; i++) {
+        for(let j=i+1; j<len; j++) {
+            maxWater = Math.max(maxWater, Math.min(height[i],height[j]) * (j-i))
+        }
+    }
+    return maxWater
+};
+```
+
+#### 复杂度分析
+
++ 时间复杂度：$ O(N^2) $。
++ 空间复杂度：$ O(1) $。
+
+#### 小注
+代码可以运行并且无误，但是超出了平台的时间限制 QAQ
+
+### 方法二：双指针法
+
+#### 思路及算法
+首先对该问题进行模式识别，由于有左右两个边界，需要移动左右两侧的问题，自然可以考虑使用双指针法。那么接下来所要解决的问题也就是如何去移动两个指针。
+
+题目所给的已知条件我们可以得出，相同情况下（边界的两个高度相同），边界间距越大越好；区域的面积受限于两个边界中的较小值。
+
+解法的主要思路就是：
+1. 两个指针分别从两头出发，相向而行
+2. 每次只移动高度较小的指针，并比较记录最大面积
+
+#### 代码
+
+```javascript
+let len = height.length;
+let left = 0, right = len-1;
+let maxWater = 0;
+while((left-1)!=right) {
+    maxWater = Math.max(maxWater, (right-left) * Math.min(height[left], height[right]))
+    height[left]<height[right]?left++:right--; 
+}
+return maxWater
+```
+
+#### 复杂度分析
+
++ 时间复杂度：$ O(N) $。
++ 空间复杂度：$ O(1) $。
+
+--- 
+
+## [15. 三数之和](https://leetcode-cn.com/problems/3sum/)
+
+![](images/8.png)
+
+### 方法一：暴力解法
+
+#### 思路及算法
+三数之和，三个 for 循环瞬间解决问题，时间复杂度三次方，这太暴力了 QAQ
+
+又由于题目还要求结果不能重复，所以还需要进行去重操作，太麻烦了，还是别暴力了吧
+
+#### 复杂度分析
+
++ 时间复杂度：$ O(N^3) $。
++ 空间复杂度：$ O(1) $。
+
+### 方法二：双指针法
+
+#### 思路及算法
+题目中的关键字在于 不可以包含重复，所有对问题模式识别之后我们可以选择使用`排序`来避免重复答案
+
+另外，我们可以将三数之和降维为两数之和，这样就巧妙地把问题转换为可以用双指针法解决的问题了。
+
+#### 代码
+
+```javascript
+```
+
+#### 复杂度分析
+
++ 时间复杂度：$ 排序：O(logN)，搜索：O(N^2)，双指针法：O(N^2) --> 总：O(N^2)$。
++ 空间复杂度：$ O(1) $。
